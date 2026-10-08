@@ -1,0 +1,111 @@
+export type Money = string;
+export type Account = {
+  id: string;
+  name: string;
+  kind: string;
+  opening: Money;
+  balance: Money;
+  archived: boolean;
+  version: number;
+};
+export type Category = {
+  id: string;
+  name: string;
+  color: string;
+  icon: string;
+  daily: boolean;
+  carry: boolean;
+  version: number;
+};
+export type Transaction = {
+  id: string;
+  kind: string;
+  amount: Money;
+  accountId: string;
+  targetId: string;
+  categoryId: string;
+  description: string;
+  date: string;
+  createdAt: string;
+  updatedAt: string;
+  version: number;
+};
+export type Goal = {
+  id: string;
+  name: string;
+  target: Money;
+  allocated: Money;
+  deadline: string;
+  priority: number;
+  icon: string;
+  color: string;
+  version: number;
+  contributions: { id: string; amount: Money; accountId: string; date: string }[];
+};
+export type Obligation = {
+  id: string;
+  name: string;
+  amount: Money;
+  date: string;
+  categoryId: string;
+  recurrence: string;
+  transactionId: string;
+  version: number;
+};
+export type Budget = {
+  id: string;
+  month: string;
+  income: Money;
+  reserve: Money;
+  goalPlan: Money;
+  limits: Record<string, Money>;
+  locked: string[];
+  version: number;
+};
+export type Notification = {
+  id: string;
+  message: string;
+  categoryId: string;
+  month: string;
+  read: boolean;
+};
+export type Profile = {
+  id: string;
+  email: string;
+  name: string;
+  timezone: string;
+  demo: boolean;
+  onboarded: boolean;
+  expectedIncome: Money;
+  people: number;
+  food: Money;
+  transport: Money;
+};
+export type Snapshot = {
+  schema: number;
+  revision: number;
+  rules?: { keyword: string; categoryId: string }[];
+  audit?: { id: string; kind: string; at: string; detail: string }[];
+  profile: Profile;
+  accounts: Account[];
+  categories: Category[];
+  transactions: Transaction[];
+  goals: Goal[];
+  obligations: Obligation[];
+  budgets: Budget[];
+  notifications: Notification[];
+};
+export type Dashboard = {
+  balance: Money;
+  available: Money;
+  expenses: Money;
+  income: Money;
+  budget: Money;
+  remaining: Money;
+  reserved: Money;
+  unpaid: Money;
+  days: number;
+  daily: Money;
+  categories: Record<string, Money>;
+};
+export type Command = Record<string, unknown>;
