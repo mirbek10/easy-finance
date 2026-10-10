@@ -58,6 +58,8 @@ test("registration, account, income, budget warning, sync and idempotency", asyn
   await page.getByLabel("Название счёта").fill("Тестовая карта");
   await page.getByRole("button", { name: "Сохранить", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Тестовая карта" })).toBeVisible();
+  await page.reload();
+  await expect(page.getByLabel("Email", { exact: true })).toHaveCount(0);
   const headers = { "X-Requested-With": "IzyFinance", Origin: "http://localhost:3000" };
   const snapshot = await (await context.request.get("/api/v1/sync/snapshot")).json();
   const account = snapshot.accounts[0].id;

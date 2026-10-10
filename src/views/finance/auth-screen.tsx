@@ -58,7 +58,7 @@ export function AuthScreen() {
         </div>
         <h1 id="auth-title">{mode === "login" ? "Войдите в аккаунт" : "Создайте аккаунт"}</h1>
         <p className="form-hint">
-          Ваши счета, бюджет и цели — в одном месте. Вход требуется при каждом открытии сайта.
+          Ваши счета, бюджет и цели — в одном месте. Войдите, чтобы продолжить.
         </p>
         <form className="form-stack" onSubmit={submit} key={mode}>
           <fieldset disabled={busy} className="auth-fields">

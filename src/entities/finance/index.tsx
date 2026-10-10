@@ -8,6 +8,7 @@ import { createStore, useStore } from "zustand";
 import { demo, demoDashboard } from "./demo";
 type Model = {
   authenticated: boolean;
+  sessionChecked: boolean;
   snapshot: Snapshot;
   dashboard: Dashboard;
   month: string;
@@ -20,6 +21,7 @@ type Model = {
 function makeStore() {
   return createStore<Model>((set) => ({
     authenticated: false,
+    sessionChecked: false,
     snapshot: demo,
     dashboard: demoDashboard,
     month: "2026-10",
@@ -174,6 +176,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     await receive(snapshot);
     store.getState().set({
       authenticated: true,
+      sessionChecked: true,
       month: today(snapshot.profile.timezone).slice(0, 7),
       pending: await offline.list(snapshot.profile.id),
       tab: "overview",
@@ -198,7 +201,28 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
   };
   useEffect(() => {
     active.current = true;
-    // Every document load starts locked. Never reveal cached finances before login.
+    let cancelled = false;
+    const restoreSession = async () => {
+      try {
+        const snapshot = await api.snapshot();
+        if (cancelled || !active.current) return;
+        await receive(snapshot);
+
+        const pending = await offline.list(snapshot.profile.id);
+        if (cancelled || !active.current) return;
+        store.getState().set({
+          authenticated: true,
+          month: today(snapshot.profile.timezone).slice(0, 7),
+          pending,
+        });
+      } catch {
+        // No valid session cookie: leave the login screen visible.
+      } finally {
+        if (!cancelled && active.current) store.getState().set({ sessionChecked: true });
+      }
+    };
+    void restoreSession();
+
     const focus = () => {
       void replay();
     };
@@ -208,6 +232,7 @@ export function FinanceProvider({ children }: { children: ReactNode }) {
     window.addEventListener("offline", lost);
     const timer = setInterval(focus, 30000);
     return () => {
+      cancelled = true;
       active.current = false;
       clearInterval(timer);
       window.removeEventListener("online", focus);
